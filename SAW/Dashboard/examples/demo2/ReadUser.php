@@ -79,8 +79,11 @@
                                 <div class="dropdown-user-scroll scrollbar-outer">
                                     <li>
                                         <div class="user-box">
-                                            <div class="avatar-lg"><img src="../assets/img/profile.jpg"
-                                                    alt="image profile" class="avatar-img rounded"></div>
+                                            <div class="avatar-lg">
+                                                <?php
+                                                    echo '<img src="data:'.$_SESSION['imageType'].';base64,'.base64_encode($_SESSION['imageData']).'"/>';
+                                                ?>
+                                            </div>
                                             <div class="u-text">
                                                 <h4><?php echo $_SESSION['nome']; ?></h4>
                                                 <p class="text-muted"><?php echo $_SESSION['email']; ?></p><a
@@ -120,7 +123,7 @@
                             <a data-toggle="collapse" href="#collapseExample" aria-expanded="true">
                                 <span>
                                     Hizrian
-                                    <span class="user-level">Administrator</span>
+                                    <span class="user-level"><?php echo $_SESSION['roles']; ?></span>
                                     <span class="caret"></span>
                                 </span>
                             </a>

@@ -39,6 +39,9 @@ if(mysqli_num_rows($result) > 0 ){
       if($row["roles"]=="Administrator"){
         $_SESSION['id'] = $row["id"];
         $_SESSION['nome'] = $row["nome"];
+        $_SESSION['imageData'] = $row["imageData"];
+        $_SESSION['imageType'] = $row["imageType"];
+        $_SESSION['roles'] = $row["roles"];
         $_SESSION['email'] = $row["email"];
         header('location:ReadUser.php');
        }

@@ -11,6 +11,19 @@ $nome_err = $email_err = $idade_err = $role_err = "";
 // Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     
+    if (count($_FILES) > 0) {
+        if (is_uploaded_file($_FILES['file']['tmp_name'])) {
+            $imageData = file_get_contents($_FILES['file']['tmp_name']);
+            $imageProperties = getimageSize($_FILES['file']['tmp_name']);
+        }
+        else {
+            echo "nao fez upload";
+        }
+    }
+    else {
+        echo "problema de FILES";
+    }
+
     // Validate name
     $input_name = trim($_POST["nome"]);
     if(empty($input_name)){
@@ -58,11 +71,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Check input errors before inserting in database
     if(empty($nome_err) && empty($email_err) && empty($idade_err)){
         // Prepare an insert statement
-        $sql = "INSERT INTO user (nome, email, idade, roles, pass) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO user (nome, email, idade, roles, pass, imageData, imageType) VALUES (?, ?, ?, ?, ?, ?, ?)";
          
         if($stmt = mysqli_prepare($link, $sql)){
             // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "sssss", $param_name, $param_address, $param_salary, $param_roles, $param_pass);
+            mysqli_stmt_bind_param($stmt, "sssssss", $param_name, $param_address, $param_salary, $param_roles, $param_pass, $param_imageData, $param_imageType);
             
             // Set parameters
             $param_name = $nome; 
@@ -70,6 +83,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $param_salary = $idade;
             $param_roles = $roles;
             $param_pass = md5($pass);
+            $param_imageData = $imageData;
+            $param_imageType = $imageProperties['mime'];
             
             // Attempt to execute the prepared statement
             if(mysqli_stmt_execute($stmt)){
@@ -548,7 +563,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         <div class="row">
                             <div class="col-md-12">
                                 <h2 class="mt-5">Criar Utilizador</h2>
-                                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"
+                                    enctype="multipart/form-data" method="post">
                                     <div class="form-group">
                                         <label>Nome</label>
                                         <input type="text" name="nome"
@@ -591,37 +607,48 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                         </select>
                                         <span class="invalid-feedback"><?php echo $role_err;?></span>
                                     </div>
+                                    <div class="input-group-addon">Image / Avatar</div>
                             </div>
-                            <input type="submit" class="btn btn-primary" value="Submit">
-                            <a href="index.html" class="btn btn-secondary ml-2">Cancel</a>
-                            </form>
+                            <div class="col-6 col-md-4">
+                                <input type="file" id="file-multiple-input" name="file" multiple=""
+                                    class="form-control-file">
+                            </div>
+                            <div class="input-group-addon">
+                                <i class="fa fa-images"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <input type="submit" class="btn btn-primary" value="Submit">
+                <a href="index.html" class="btn btn-secondary ml-2">Cancel</a>
+                </form>
             </div>
         </div>
-        <footer class="footer">
-            <div class="container-fluid">
-                <nav class="pull-left">
-                    <ul class="nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                Help
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                Licenses
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <div class="copyright ml-auto">
-                    2018, made with <i class="fa fa-heart heart text-danger"></i> by <a
-                        href="https://www.themekita.com">ThemeKita</a>
-                </div>
+    </div>
+    </div>
+    </div>
+    <footer class="footer">
+        <div class="container-fluid">
+            <nav class="pull-left">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            Help
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            Licenses
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="copyright ml-auto">
+                2018, made with <i class="fa fa-heart heart text-danger"></i> by <a
+                    href="https://www.themekita.com">ThemeKita</a>
             </div>
-        </footer>
+        </div>
+    </footer>
     </div>
     </div>
 
