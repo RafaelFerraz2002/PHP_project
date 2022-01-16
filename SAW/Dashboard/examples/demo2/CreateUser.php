@@ -8,9 +8,20 @@ require("session.php");
 $nome = $email = $idade = $roles = $pass = "";
 $nome_err = $email_err = $idade_err = $role_err = "";
  
+$sal = "salt";
+$salt = md5($sal);
+
 // Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
+
+    $nome = filter_var($_POST["nome"], FILTER_SANITIZE_STRING);
+    $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
+    $idade = filter_var($_POST["idade"], FILTER_SANITIZE_NUMBER_INT);
+    $pass = filter_var($_POST["pass"], FILTER_SANITIZE_STRING);
     
+    // echo "<pre>";
+    // print_r($_FILES);
+    // exit();
     if (count($_FILES) > 0) {
         if (is_uploaded_file($_FILES['file']['tmp_name'])) {
             $imageData = file_get_contents($_FILES['file']['tmp_name']);
@@ -28,7 +39,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $input_name = trim($_POST["nome"]);
     if(empty($input_name)){
         $nome_err = "Please enter a name.";
-    } elseif(!filter_var($input_name, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[a-zA-Z\s]+$/")))){
+    } elseif(!filter_var($input_name, FILTER_SANITIZE_STRING)){
         $nome_err = "Please enter a valid name.";
     } else{
         $nome = $input_name;
@@ -82,7 +93,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $param_address = $email;
             $param_salary = $idade;
             $param_roles = $roles;
-            $param_pass = md5($pass);
+            $param_pass = md5($pass).$salt;
             $param_imageData = $imageData;
             $param_imageType = $imageProperties['mime'];
             
@@ -608,19 +619,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                         <span class="invalid-feedback"><?php echo $role_err;?></span>
                                     </div>
                                     <div class="input-group-addon">Image / Avatar</div>
-                            </div>
-                            <div class="col-6 col-md-4">
-                                <input type="file" id="file-multiple-input" name="file" multiple=""
-                                    class="form-control-file">
-                            </div>
-                            <div class="input-group-addon">
-                                <i class="fa fa-images"></i>
+                                    <div class="col-6 col-md-4">
+                                        <input type="file" id="file-multiple-input" name="file" multiple
+                                            class="form-control-file">
+                                    </div>
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-images"></i>
+                                    </div>
                             </div>
                         </div>
                     </div>
+                    <input type="submit" class="btn btn-primary" value="Submit">
+                    <a href="index.html" class="btn btn-secondary ml-2">Cancel</a>
                 </div>
-                <input type="submit" class="btn btn-primary" value="Submit">
-                <a href="index.html" class="btn btn-secondary ml-2">Cancel</a>
                 </form>
             </div>
         </div>

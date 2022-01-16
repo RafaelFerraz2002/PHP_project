@@ -651,15 +651,14 @@ if(isset($_POST["id"]) && !empty($_POST["id"])){
                                         <select name="role" id="select"
                                             class="form-control <?php echo (!empty($role_err)) ? 'is-invalid' : ''; ?>"
                                             Required>
-                                            <?php
-                                                                
-                                                                if($row["role"] == "Administrator"){?>
-                                            <option value="Public">Public</option>
+                                            <?php                
+                                                if($row["role"] == "Administrator"){?>
                                             <option value="Administrator">Administrator</option>
+                                            <option value="Public">Public</option>
                                             <?php
                                                                 } else {?>
-                                            <option value="Administrator">Administrator</option>
-                                            <option value="Public">Public</option><?php
+                                            <option value="Public">Public</option>
+                                            <option value="Administrator">Administrator</option><?php
                                                                 }
                                                               
                                                                   ?>

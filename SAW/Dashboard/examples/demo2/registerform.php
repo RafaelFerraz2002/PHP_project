@@ -1,4 +1,108 @@
 <!DOCTYPE html>
+<?php
+// Include config file
+require_once "config.php";
+ 
+// Define variables and initialize with empty values
+$nome = $email = $idade = $roles = $pass = "";
+$nome_err = $email_err = $idade_err = $role_err = "";
+ 
+// Processing form data when form is submitted
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+    
+    if (count($_FILES) > 0) {
+        if (is_uploaded_file($_FILES['file']['tmp_name'])) {
+            $imageData = file_get_contents($_FILES['file']['tmp_name']);
+            $imageProperties = getimageSize($_FILES['file']['tmp_name']);
+        }
+        else {
+            echo "nao fez upload";
+        }
+    }
+    else {
+        echo "problema de FILES";
+    }
+
+    // Validate name
+    $input_name = trim($_POST["nome"]);
+    if(empty($input_name)){
+        $nome_err = "Please enter a name.";
+    } elseif(!filter_var($input_name, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[a-zA-Z\s]+$/")))){
+        $nome_err = "Please enter a valid name.";
+    } else{
+        $nome = $input_name;
+    }
+    
+    // Validate address
+    $input_email = trim($_POST["email"]);
+    if(empty($input_email)){
+        $email_err = "Please enter a email.";     
+    } else{
+        $email = $input_email;
+    }
+    
+    // Validate salary
+    $input_idade = trim($_POST["idade"]);
+    if(empty($input_idade)){
+        $idade_err = "Please enter age.";     
+    } elseif(!ctype_digit($input_idade)){
+        $idade_err = "Please enter a positive integer value.";
+    } else{
+        $idade = $input_idade;
+    }
+
+    // Validate role
+    $input_role = trim($_POST["role"]);
+    if(empty($input_role)){
+        $role_err = "Please enter role";     
+    } else{
+        $roles = $input_role;
+    }
+
+    // Validate pass
+    $input_pass = trim($_POST["pass"]);
+    if(empty($input_pass)){
+        $email_err = "Please enter an pass";     
+    } else{
+        $pass = $input_pass;
+    }
+    
+    // Check input errors before inserting in database
+    if(empty($nome_err) && empty($email_err) && empty($idade_err)){
+        // Prepare an insert statement
+        $sql = "INSERT INTO user (nome, email, idade, roles, pass, imageData, imageType) VALUES (?, ?, ?, ?, ?, ?, ?)";
+         
+        if($stmt = mysqli_prepare($link, $sql)){
+            // Bind variables to the prepared statement as parameters
+            mysqli_stmt_bind_param($stmt, "sssssss", $param_name, $param_address, $param_salary, $param_roles, $param_pass, $param_imageData, $param_imageType);
+            
+            // Set parameters
+            $param_name = $nome; 
+            $param_address = $email;
+            $param_salary = $idade;
+            $param_roles = $roles;
+            $param_pass = md5($pass);
+            $param_imageData = $imageData;
+            $param_imageType = $imageProperties['mime'];
+            
+            // Attempt to execute the prepared statement
+            if(mysqli_stmt_execute($stmt)){
+                // Records created successfully. Redirect to landing page
+                header('location:ReadUser.php');
+                exit();
+            } else{
+                echo "Oops! Something went wrong. Please try again later.";
+            }
+        }
+        // Close statement
+        mysqli_stmt_close($stmt);
+    }
+    
+    // Close connection
+    mysqli_close($link);
+}
+?>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -31,18 +135,15 @@
     </script>
 
     <style>
-    #login .container #login-row #login-column #login-box {
-        margin-top: 120px;
-        max-width: 600px;
-        height: 320px;
+    .wrapper2 {
+        width: 600px;
+        margin: 0 auto;
     }
 
-    #login .container #login-row #login-column #login-box #login-form {
-        padding: 20px;
-    }
-
-    #login .container #login-row #login-column #login-box #login-form #register-link {
-        margin-top: -85px;
+    .icon-rtl {
+        padding-right: 25px;
+        background: url("https://static.thenounproject.com/png/101791-200.png") no-repeat right;
+        background-size: 20px;
     }
     </style>
 
@@ -99,7 +200,7 @@
                     <div class="page-inner py-5">
                         <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                             <div>
-                                <h2 class="text-white pb-2 fw-bold">Login</h2>
+                                <h2 class="text-white pb-2 fw-bold">Registo</h2>
                             </div>
                         </div>
                     </div>
@@ -109,64 +210,98 @@
                         <div id="login-row" class="row justify-content-center align-items-center">
                             <div id="login-column" class="col-md-6">
                                 <div id="login-box" class="col-md-12">
-                                    <form id="login-form" class="form" action="login.php" method="post">
+                                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"
+                                        enctype="multipart/form-data" method="post">
                                         <div class="form-group">
-                                            <label for="email" class="text-info">Email:</label><br>
-                                            <input type="text" name="email" id="username"
-                                                value="<?php if(isset($_COOKIE["email"])) { echo $_COOKIE["email"]; } ?>"
-                                                placeholder="example@gmail.com" class="form-control" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="password" class="text-info">Password:</label><br>
-                                            <input type="text" name="pass"
-                                                value="<?php if(isset($_COOKIE["pass"])) { echo $_COOKIE["pass"]; }?>"
-                                                placeholder="**********" id="myInput" class="form-control" required>
+                                            <label>Nome</label>
+                                            <input type="text" name="nome"
+                                                class="form-control <?php echo (!empty($nome_err)) ? 'is-invalid' : ''; ?>"
+                                                value="<?php echo $nome; ?>">
+                                            <span class="invalid-feedback"><?php echo $nome_err;?></span>
                                         </div>
                                         <div class="form-group">
-                                            <label for="remember-me" class="text-info"><span>Remember me</span>
-                                                <span><input id="remember-me" name="remember-me" type="checkbox"
-                                                        <?php if(isset($_COOKIE)){ echo "checked";}?>></span></label><br>
-                                            <input type="submit" name="submit" class="btn btn-info btn-md"
-                                                value="Login">
+                                            <label>Email</label>
+                                            <input name="email"
+                                                class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>"
+                                                value="<?php echo $email; ?>">
+                                            <span class="invalid-feedback"><?php echo $email_err;?></span>
                                         </div>
-                                        <div id="register-link" class="text-right">
-                                            <a href="#" class="text-info">Register here</a>
+                                        <div class="form-group">
+                                            <label>Idade</label>
+                                            <input type="number" name="idade"
+                                                class="form-control <?php echo (!empty($idade_err)) ? 'is-invalid' : ''; ?>"
+                                                min="18" max="100" value="<?php echo $idade; ?>">
+                                            <span class="invalid-feedback"><?php echo $idade_err;?></span>
                                         </div>
-                                    </form>
+                                        <div class="form-group">
+                                            <label>Password</label>
+                                            <input type="password" id="pass" name="pass"
+                                                class="form-control <?php echo (!empty($pass_err)) ? 'is-invalid' : ''; ?>"
+                                                Required>
+                                            <i class="far fa-eye"
+                                                style="float:right; margin-top:-25px; margin-right:10px; cursor: pointer;"
+                                                id="togglePassword"></i>
+                                            <span class="invalid-feedback"><?php echo $pass_err;?></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Role</label>
+                                            <select name="role" id="select"
+                                                class="form-control <?php echo (!empty($role_err)) ? 'is-invalid' : ''; ?>"
+                                                Required>
+                                                <option value="">Choose the User Role</option>
+                                                <option value="Public">Public</option>
+                                            </select>
+                                            <span class="invalid-feedback"><?php echo $role_err;?></span>
+                                        </div>
+                                        <div class="input-group-addon">Image / Avatar</div>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <input type="file" id="file-multiple-input" name="file" multiple=""
+                                        class="form-control-file">
+                                </div>
+                                <div class="input-group-addon">
+                                    <i class="fa fa-images"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <input type="submit" class="btn btn-primary" value="Submit">
+                    <a href="index.html" class="btn btn-secondary ml-2">Cancel</a>
+                    </form>
                 </div>
             </div>
-            <footer class="footer">
-                <div class="container-fluid">
-                    <nav class="pull-left">
-                        <ul class="nav">
-                            <li class="nav-item">
-                                <a class="nav-link" href="https://www.themekita.com">
-                                    ThemeKita
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">
-                                    Help
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">
-                                    Licenses
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                    <div class="copyright ml-auto">
-                        2018, made with <i class="fa fa-heart heart text-danger"></i> by <a
-                            href="https://www.themekita.com">ThemeKita</a>
-                    </div>
-                </div>
-            </footer>
         </div>
+    </div>
+    </div>
+    </div>
+    <footer class="footer">
+        <div class="container-fluid">
+            <nav class="pull-left">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.themekita.com">
+                            ThemeKita
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            Help
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            Licenses
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="copyright ml-auto">
+                2018, made with <i class="fa fa-heart heart text-danger"></i> by <a
+                    href="https://www.themekita.com">ThemeKita</a>
+            </div>
+        </div>
+    </footer>
+    </div>
     </div>
     <!--   Core JS Files   -->
     <script src="../assets/js/core/jquery.3.2.1.min.js"></script>

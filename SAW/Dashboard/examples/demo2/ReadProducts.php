@@ -72,7 +72,9 @@
                             <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#"
                                 aria-expanded="false">
                                 <div class="avatar-sm">
-                                    <img src="../assets/img/profile.jpg" alt="..." class="avatar-img rounded-circle">
+                                    <?php
+                                        echo '<img class="avatar-img rounded-circle" alt="..." src="data:'.$_SESSION['imageType'].';base64,'.base64_encode($_SESSION['imageData']).'"/>';
+                                    ?>
                                 </div>
                             </a>
                             <ul class="dropdown-menu dropdown-user animated fadeIn">
@@ -81,24 +83,16 @@
                                         <div class="user-box">
                                             <div class="avatar-lg">
                                                 <?php
-                                                        echo '<img src="data:'.$_SESSION['imageType'].';base64,'.base64_encode($_SESSION['imageData']).'"/>';
+                                                    echo '<img class="img" src="data:'.$_SESSION['imageType'].';base64,'.base64_encode($_SESSION['imageData']).'"/>';
                                                 ?>
                                             </div>
                                             <div class="u-text">
                                                 <h4><?php echo $_SESSION['nome']; ?></h4>
-                                                <p class="text-muted"><?php echo $_SESSION['email']; ?></p><a
-                                                    href="profile.html" class="btn btn-xs btn-secondary btn-sm">View
-                                                    Profile</a>
+                                                <p class="text-muted"><?php echo $_SESSION['email']; ?></p>
                                             </div>
                                         </div>
                                     </li>
                                     <li>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="#">My Profile</a>
-                                        <a class="dropdown-item" href="#">My Balance</a>
-                                        <a class="dropdown-item" href="#">Inbox</a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="#">Account Setting</a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="logout.php">Logout</a>
                                     </li>
@@ -117,47 +111,28 @@
                 <div class="sidebar-content">
                     <div class="user">
                         <div class="avatar-sm float-left mr-2">
-                            <img src="../assets/img/profile.jpg" alt="..." class="avatar-img rounded-circle">
+                            <?php
+                                echo '<img class="avatar-img rounded-circle" alt="..." src="data:'.$_SESSION['imageType'].';base64,'.base64_encode($_SESSION['imageData']).'"/>';
+                            ?>
                         </div>
                         <div class="info">
                             <a data-toggle="collapse" href="#collapseExample" aria-expanded="true">
                                 <span>
-                                    Hizrian
+                                    <?php echo $_SESSION['nome']; ?>
                                     <span class="user-level"><?php echo $_SESSION['roles']; ?></span>
-                                    <span class="caret"></span>
                                 </span>
                             </a>
                             <div class="clearfix"></div>
-
-                            <div class="collapse in" id="collapseExample">
-                                <ul class="nav">
-                                    <li>
-                                        <a href="#profile">
-                                            <span class="link-collapse">My Profile</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#edit">
-                                            <span class="link-collapse">Edit Profile</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#settings">
-                                            <span class="link-collapse">Settings</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
                         </div>
                     </div>
                     <ul class="nav nav-primary">
                         <li class="nav-item">
-                            <a data-toggle="collapse" href="#dashboard" class="collapsed" aria-expanded="false">
-                                <i class="fas fa-home"></i>
+                            <a data-toggle="collapse" href="#Users" class="collapsed" aria-expanded="false">
+                                <i class="fas fa-user"></i>
                                 <p>Utilizadores</p>
                                 <span class="caret"></span>
                             </a>
-                            <div class="collapse" id="dashboard">
+                            <div class="collapse" id="Users">
                                 <ul class="nav nav-collapse">
                                     <li>
                                         <a href="../demo2/CreateUser.php">
@@ -166,6 +141,27 @@
                                     </li>
                                     <li>
                                         <a href="../demo2/ReadUser.php">
+                                            <span class="sub-item">Listar</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a data-toggle="collapse" href="#Products" class="collapsed" aria-expanded="false">
+                                <i class="fas fa-home"></i>
+                                <p>Produtos</p>
+                                <span class="caret"></span>
+                            </a>
+                            <div class="collapse" id="Products">
+                                <ul class="nav nav-collapse">
+                                    <li>
+                                        <a href="../demo2/CreateProduct.php">
+                                            <span class="sub-item">Criar</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="../demo2/ReadProducts.php">
                                             <span class="sub-item">Listar</span>
                                         </a>
                                     </li>
@@ -236,9 +232,9 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mt-5 mb-3 clearfix">
-                                    <h2 class="pull-left">Users Details</h2>
-                                    <a href="CreateUser.php" class="btn btn-success pull-right"><i
-                                            class="fa fa-plus"></i> Add New User</a>
+                                    <h2 class="pull-left">Products Details</h2>
+                                    <a href="CreateProduct.php" class="btn btn-success pull-right"><i
+                                            class="fa fa-plus"></i> Add New Product</a>
                                 </div>
                                 <?php
                     // Include config file
@@ -267,7 +263,7 @@
                                         echo "<td>" . $row['preco'] . "</td>";
                                         echo "<td>";
 											echo '<a href="UpdateUser.php?id='. $row['id'] .'" class="mr-3" title="Update Record" data-toggle="tooltip"><span class="fa fa-pen"></span></a>';
-											echo '<a href="DeleteUser.php?id='. $row['id'] .'" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>';
+											echo '<a href="DeleteProduct.php?id='. $row['id'] .'" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>';
 									echo "</td>";
                                     echo "</tr>";
                                 }

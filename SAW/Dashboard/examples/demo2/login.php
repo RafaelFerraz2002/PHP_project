@@ -21,9 +21,6 @@ $pass = $_POST['pass'];
 
 $sql = "SELECT * FROM user WHERE email = '$email'";
 
-
-
-
 $result = mysqli_query($link, $sql);
 
 if(mysqli_num_rows($result) > 0 ){
@@ -67,8 +64,6 @@ session_unset();
 
 // destroy the session
 session_destroy();
-echo "nao fiz login";
-
   }
 }
 ?>

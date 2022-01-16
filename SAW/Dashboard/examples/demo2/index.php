@@ -118,19 +118,22 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="password" class="text-info">Password:</label><br>
-                                            <input type="text" name="pass"
+                                            <input type="password" name="pass"
                                                 value="<?php if(isset($_COOKIE["pass"])) { echo $_COOKIE["pass"]; }?>"
-                                                placeholder="**********" id="myInput" class="form-control" required>
+                                                placeholder="**********" id="pass" class="form-control" required>
+                                            <i class="far fa-eye"
+                                                style="float:right; margin-top:-25px; margin-right:10px; cursor: pointer;"
+                                                id="togglePassword"></i>
                                         </div>
                                         <div class="form-group">
-                                            <label for="remember-me" class="text-info"><span>Remember me</span>
-                                                <span><input id="remember-me" name="remember-me" type="checkbox"
+                                            <label for="remember" class="text-info"><span>Remember me</span>
+                                                <span><input id="remember" name="remember" type="checkbox"
                                                         <?php if(isset($_COOKIE)){ echo "checked";}?>></span></label><br>
                                             <input type="submit" name="submit" class="btn btn-info btn-md"
                                                 value="Login">
                                         </div>
                                         <div id="register-link" class="text-right">
-                                            <a href="#" class="text-info">Register here</a>
+                                            <a href="registerform.php" class="text-info">Register here</a>
                                         </div>
                                     </form>
                                 </div>
@@ -209,6 +212,18 @@
     <!-- Atlantis DEMO methods, don't include it in your project! -->
     <!-- <script src="../assets/js/setting-demo.js"></script>
 	<script src="../assets/js/demo.js"></script> -->
+    <script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#pass');
+
+    togglePassword.addEventListener('click', function(e) {
+        // toggle the type attribute
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        // toggle the eye slash icon
+        this.classList.toggle('fa-eye-slash');
+    });
+    </script>
     <script>
     $('#lineChart').sparkline([102, 109, 120, 99, 110, 105, 115], {
         type: 'line',
